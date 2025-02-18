@@ -83,11 +83,6 @@ describe("Get Product Controller tests", () => {
     mockFindSuccess.sort.mockResolvedValue([]);
     productModel.find = jest.fn().mockReturnValue(mockFindSuccess);
 
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
-    };
-
     await getProductController({}, res);
 
     // Assertions
