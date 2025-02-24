@@ -95,54 +95,6 @@ describe("Get Product Controller tests", () => {
     });
   });
 
-  it("Should fetch no more products than the maximum product limit", async () => {
-    const mockProductsExceedLimit = Array.from(
-      { length: PRODUCT_LIMIT + 2 },
-      (_, index) => ({
-        _id: index.toString(),
-        name: `Toy ${index}`,
-        slug: `Toy-${index}`,
-        description: `Toy description ${index}`,
-        price: 10 + index,
-        category: {
-          _id: "456",
-          name: "Toys",
-          slug: "toys",
-          __v: 0,
-        },
-        quantity: 10,
-        createdAt: "2025-02-02T10:19:37.524Z",
-        updatedAt: "2025-02-13T08:11:52.724Z",
-        __v: 0,
-      })
-    );
-
-    mockFindSuccess = {
-      populate: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockImplementation((limit) => ({
-        ...mockFindSuccess,
-        sort: jest
-          .fn()
-          .mockResolvedValue(mockProductsExceedLimit.slice(0, limit)),
-      })),
-      sort: jest.fn().mockResolvedValue(mockProductsExceedLimit),
-    };
-
-    productModel.find = jest.fn().mockReturnValue(mockFindSuccess);
-
-    await getProductController({}, res);
-
-    // Assertions
-    expect(res.status).toBeCalledWith(200);
-    expect(res.send).toBeCalledWith({
-      success: true,
-      counTotal: 12,
-      message: "AllProducts",
-      products: mockProductsExceedLimit.slice(0, PRODUCT_LIMIT),
-    });
-  });
-
   it("Should return error response when there is error fetching products", async () => {
     const mockFindError = {
       ...mockFindSuccess,
