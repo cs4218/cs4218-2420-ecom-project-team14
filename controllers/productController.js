@@ -6,7 +6,7 @@ import fs from "fs";
 import slugify from "slugify";
 import braintree from "braintree";
 import dotenv from "dotenv";
-import { PRODUCT_LIMIT } from "./constants/productConstants.js";
+import { PRODUCT_LIMIT, PER_PAGE_LIMIT } from "./constants/productConstants.js";
 
 dotenv.config();
 
@@ -240,16 +240,29 @@ export const productCountController = async (req, res) => {
   }
 };
 
-// product list base on page
+// product list based on page
 export const productListController = async (req, res) => {
   try {
-    const perPage = 6;
-    const page = req.params.page ? req.params.page : 1;
+    // req.params.page will always be a string
+    // Page will be NaN if req.params.page is not a numeric-integer string
+    // Deals with null values which will become NaN
+    let page = parseInt(req.params.page, 10);
+
+    // Reject non-integers, null values and negative and 0 values
+    if (!Number.isInteger(page) || page < 1) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid page number. Page must be positive integer",
+      });
+    }
+
+    page = Math.max(1, page);
+
     const products = await productModel
       .find({})
       .select("-photo")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
+      .skip((page - 1) * PER_PAGE_LIMIT)
+      .limit(PER_PAGE_LIMIT)
       .sort({ createdAt: -1 });
     res.status(200).send({
       success: true,
