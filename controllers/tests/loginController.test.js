@@ -63,7 +63,7 @@ describe("Login Controller Tests", () => {
         userModel.findOne = jest.fn().mockResolvedValue(null);
 
         await loginController(req, res);
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send.mock.lastCall[0].message).toBe("Invalid email or password has been entered or email is not registered");
         
         // Checks that it does not reach this method
@@ -75,7 +75,7 @@ describe("Login Controller Tests", () => {
         req.body.email = "non.existent.email@mail.com";
 
         await loginController(req, res);
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send.mock.lastCall[0].message).toBe("Invalid email or password has been entered or email is not registered");
     });
 
@@ -87,7 +87,7 @@ describe("Login Controller Tests", () => {
         userModel.findOne = jest.fn().mockResolvedValue(null);
 
         await loginController(req, res);
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send.mock.lastCall[0].message).toBe("Invalid email or password has been entered or email is not registered");
 
         // Checks that it does not reach this method
@@ -111,7 +111,7 @@ describe("Login Controller Tests", () => {
         req.body.password = "ThisShouldNotBeWorking";
 
         await loginController(req, res);
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send.mock.lastCall[0].message).toBe("Invalid email or password has been entered or email is not registered");
     });
 
