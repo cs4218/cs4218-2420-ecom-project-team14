@@ -1,19 +1,20 @@
 import { jest } from "@jest/globals";
 import productModel from "../../models/productModel.js";
 import { getSingleProductController } from "../productController.js";
+import { ObjectId } from "mongodb";
 
 jest.mock("../../models/productModel");
 describe("Get Single Product Controller tests", () => {
   let res, req;
 
   const mockProduct = {
-    _id: "123",
+    _id: new ObjectId("242ddde9effa794b93f20688"),
     name: "Toy Giraffe",
     slug: "toy-giraffe",
     description: "Some toy giraffe",
     price: 10,
     category: {
-      _id: "456",
+      _id: new ObjectId("bc7f29ed898fefd6a5f713fd"),
       name: "Toys",
       slug: "toys",
       __v: 0,
