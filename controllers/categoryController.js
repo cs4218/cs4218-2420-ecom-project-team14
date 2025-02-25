@@ -6,11 +6,16 @@ export const createCategoryController = async (req, res) => {
     if (!name) {
       return res.status(401).send({ message: "Name is required" });
     }
-    const existingCategory = await categoryModel.findOne({ name });
+    // Add validation to ensure that length of category name is not more than 100 characters
+    if (name.length > 100) {
+      return res.status(401).send({ message: "Name of category can only be up to 100 characters long"});
+    }
+
+    // Add validation to ensure that search is case insensitive 
+    const existingCategory = await categoryModel.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i')} });
     if (existingCategory) {
-      return res.status(200).send({
-        success: true,
-        message: "Category Already Exisits",
+      return res.status(401).send({
+        message: "The name of the category already exists",
       });
     }
     const category = await new categoryModel({
@@ -26,8 +31,8 @@ export const createCategoryController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      errro,
-      message: "Errro in Category",
+      error,
+      message: "Error in Category",
     });
   }
 };
