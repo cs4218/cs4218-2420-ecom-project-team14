@@ -99,7 +99,16 @@ export const singleCategoryController = async (req, res) => {
 export const deleteCategoryCOntroller = async (req, res) => {
   try {
     const { id } = req.params;
-    await categoryModel.findByIdAndDelete(id);
+    if (!id) {
+      return res.status(400).send({ message: "Category id cannot be empty"});
+    }
+
+    const category = await categoryModel.findByIdAndDelete(id);
+
+    if (!category) {
+      return res.status(400).send({ message: "Unable to find the category to delete"});
+    }
+
     res.status(200).send({
       success: true,
       message: "Categry Deleted Successfully",
