@@ -34,7 +34,7 @@ const Profile = () => {
         phone,
         address,
       });
-      if (data?.errro) {
+      if (data?.error) {
         toast.error(data?.error);
       } else {
         setAuth({ ...auth, user: data?.updatedUser });
@@ -45,8 +45,12 @@ const Profile = () => {
         toast.success("Profile Updated Successfully");
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
+      if (error.response && error.response.status === 400) {
+        toast.error(error.response?.data?.message);
+      } else {
+        console.log(error);
+        toast.error("Something went wrong");
+      }
     }
   };
   return (

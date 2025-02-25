@@ -23,7 +23,7 @@ describe("Get Orders Controller Tests", () => {
         };
     }); 
 
-    // Case 1: Success case where the an orders made by the user can be obtained
+    // Case 1: Success case where the orders made by the user can be obtained
     it('should allow the user to get the list of orders that they have made', async () => {
 
         const firstMockProduct = {
