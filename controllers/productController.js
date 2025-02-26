@@ -10,7 +10,7 @@ import dotenv from "dotenv";
 import {
   PRODUCT_LIMIT,
   RELATED_PRODUCT_LIMIT,
-  PER_PAGE_LIMIT
+  PER_PAGE_LIMIT,
 } from "./constants/productConstants.js";
 
 dotenv.config();
@@ -308,18 +308,34 @@ export const productListController = async (req, res) => {
 export const searchProductController = async (req, res) => {
   try {
     const { keyword } = req.params;
-    const resutls = await productModel
+    if (!keyword || keyword.trim().length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Keyword must not be empty" });
+    }
+
+    if (keyword.length > 100) {
+      //limit to be not more than product name length restriction
+      return res
+        .status(400)
+        .json({ success: false, message: "Keyword is too long" });
+    }
+
+    // Prevents regex injection attacks: Prefix special characters with "\"
+    const safeKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const results = await productModel
       .find({
         $or: [
-          { name: { $regex: keyword, $options: "i" } },
-          { description: { $regex: keyword, $options: "i" } },
+          { name: { $regex: safeKeyword, $options: "i" } },
+          { description: { $regex: safeKeyword, $options: "i" } },
         ],
       })
       .select("-photo");
-    res.json(resutls);
+    res.status(200).json({ success: true, results });
   } catch (error) {
     console.log(error);
-    res.status(400).send({
+    res.status(400).json({
       success: false,
       message: "Error In Search Product API",
       error,
