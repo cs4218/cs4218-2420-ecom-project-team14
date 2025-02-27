@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Policy component should match snapshot 1`] = `
+<div>
+  <div
+    data-testid="mock-layout"
+    data-title="Privacy Policy"
+  >
+    <div
+      class="row contactus "
+    >
+      <div
+        class="col-md-6 "
+      >
+        <img
+          alt="contactus"
+          src="/images/contactus.jpeg"
+          style="width: 100%;"
+        />
+      </div>
+      <div
+        class="col-md-4"
+      >
+        <p>
+          add privacy policy
+        </p>
+        <p>
+          add privacy policy
+        </p>
+        <p>
+          add privacy policy
+        </p>
+        <p>
+          add privacy policy
+        </p>
+        <p>
+          add privacy policy
+        </p>
+        <p>
+          add privacy policy
+        </p>
+        <p>
+          add privacy policy
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;

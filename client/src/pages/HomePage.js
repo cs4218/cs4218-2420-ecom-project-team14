@@ -29,6 +29,7 @@ const HomePage = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error(`Error fetching categories: ${error.message}`);
     }
   };
 
@@ -46,16 +47,18 @@ const HomePage = () => {
     } catch (error) {
       setLoading(false);
       console.log(error);
+      toast.error(`Error fetching product list: ${error.message}`);
     }
   };
 
-  //getTOtal COunt
+  //getTotal Count
   const getTotal = async () => {
     try {
       const { data } = await axios.get("/api/v1/product/product-count");
       setTotal(data?.total);
     } catch (error) {
       console.log(error);
+      toast.error(`Error fetching product count: ${error.message}`);
     }
   };
 
@@ -72,6 +75,7 @@ const HomePage = () => {
       setProducts([...products, ...data?.products]);
     } catch (error) {
       console.log(error);
+      toast.error(`Error fetching product list: ${error.message}`);
       setLoading(false);
     }
   };
@@ -94,7 +98,7 @@ const HomePage = () => {
     if (checked.length || radio.length) filterProduct();
   }, [checked, radio]);
 
-  //get filterd product
+  //get filtered product
   const filterProduct = async () => {
     try {
       const { data } = await axios.post("/api/v1/product/product-filters", {
@@ -104,6 +108,7 @@ const HomePage = () => {
       setProducts(data?.products);
     } catch (error) {
       console.log(error);
+      toast.error(`Error fetching filtered products: ${error.message}`);
     }
   };
   return (
@@ -133,10 +138,10 @@ const HomePage = () => {
           <h4 className="text-center mt-4">Filter By Price</h4>
           <div className="d-flex flex-column">
             <Radio.Group onChange={(e) => setRadio(e.target.value)}>
-              {Prices?.map((p) => (
-                <div key={p._id}>
-                  <Radio value={p.array}>{p.name}</Radio>
-                </div>
+            {Prices?.map((p, index) => (
+                <Radio key={`${p._id}-${index}`} value={p.array}>
+                  {p.name}
+                </Radio>
               ))}
             </Radio.Group>
           </div>
@@ -170,7 +175,9 @@ const HomePage = () => {
                     </h5>
                   </div>
                   <p className="card-text ">
-                    {p.description.substring(0, 60)}...
+                  {p.description.length > 60
+                      ? `${p.description.substring(0, 60)}...`
+                      : p.description}
                   </p>
                   <div className="card-name-price">
                     <button
