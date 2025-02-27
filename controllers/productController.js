@@ -10,7 +10,7 @@ import dotenv from "dotenv";
 import {
   PRODUCT_LIMIT,
   RELATED_PRODUCT_LIMIT,
-  PER_PAGE_LIMIT
+  PER_PAGE_LIMIT,
 } from "./constants/productConstants.js";
 
 dotenv.config();
@@ -231,6 +231,31 @@ export const productFiltersController = async (req, res) => {
   try {
     const { checked, radio } = req.body;
     let args = {};
+    // checked validations
+    if (
+      !checked ||
+      !Array.isArray(checked) ||
+      (checked.length > 0 &&
+        !checked.every((id) => mongoose.Types.ObjectId.isValid(id)))
+    ) {
+      return res.status(400).send({
+        success: false,
+        message: "'checked' must be an array with valid category ids",
+      });
+    }
+
+    // radio validations
+    if (
+      !radio ||
+      !Array.isArray(radio) ||
+      (radio.length !== 2 && radio.length !== 0) ||
+      !radio.every((num) => typeof num === "number")
+    ) {
+      return res.status(400).send({
+        success: false,
+        message: "'radio' must an empty array or an array with two numbers",
+      });
+    }
     if (checked.length > 0) args.category = checked;
     if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
     const products = await productModel.find(args);
