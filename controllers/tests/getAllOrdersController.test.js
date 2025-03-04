@@ -18,7 +18,7 @@ describe("Get All Orders Controller Tests", () => {
         };
     });
 
-    // Case 1: Success case where admin can get all orders sorted by createdAt
+    // Test 1: Success case where admin can get all orders sorted by createdAt
     it('should allow the admin to get all orders sorted by createdAt', async () => {
         
         const firstMockProduct = {
@@ -84,11 +84,12 @@ describe("Get All Orders Controller Tests", () => {
 
         await getAllOrdersController({}, res);
 
+        // Some checks to see that the first order is firstMockOrder and second order is secondMockOrder
         expect(res.json.mock.lastCall[0][0]._id).toEqual(new ObjectId('67b1a6a6f9d490b2482c8eb2'));
         expect(res.json.mock.lastCall[0][1]._id).toEqual(new ObjectId('67b1c8283d892eb5386cb272'));
     });
 
-    // Case 2: Success case where empty array list is returned when no orders have been made
+    // Test 2: Success case where empty array list is returned when no orders have been made
     it('should return an empty array when no orders have been made', async () => {
         
         const mockPopulateSort = {
@@ -102,10 +103,11 @@ describe("Get All Orders Controller Tests", () => {
 
         await getAllOrdersController({}, res);
 
+        // Check that an empty array is passed to res.json since there are no orders that can be found
         expect(res.json.mock.lastCall[0]).toEqual([]);
     });
 
-    // Case 3: Case where there is an error when trying to get all the orders
+    // Test 3: Case where there is an error when trying to get all the orders
     it('should throw an error message when there is an error faced in getting all orders', async () => {
 
         orderModel.find = jest.fn().mockImplementation(() => {
@@ -115,6 +117,7 @@ describe("Get All Orders Controller Tests", () => {
         await getAllOrdersController({}, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
+        // Check that the message shows that there is an error while getting orders
         expect(res.send.mock.lastCall[0].message).toBe("Error WHile Geting Orders");
     });
 

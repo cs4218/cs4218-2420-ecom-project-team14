@@ -71,8 +71,8 @@ export const registerController = async (req, res) => {
     }
 
     // Add validation for answer
-    if (answer.length > 50) {
-      return res.status(400).send({ message: "The answer can only be up to 50 characters long"});
+    if (answer.length > 100) {
+      return res.status(400).send({ message: "The answer can only be up to 100 characters long"});
     }
 
     //check user
@@ -195,8 +195,8 @@ export const forgotPasswordController = async (req, res) => {
     }
 
     // Add validation for answer
-    if (answer.length > 50) {
-      return res.status(400).send({ message: "The answer can only be up to 200 characters long"});
+    if (answer.length > 100) {
+      return res.status(400).send({ message: "The answer can only be up to 100 characters long"});
     }
 
     //check
@@ -256,7 +256,7 @@ export const updateProfileController = async (req, res) => {
     }
 
     // Add validation for address
-    if (address && address.length > 50) {
+    if (address && address.length > 150) {
       return res.status(400).send({ message: "The address can only be up to 150 characters long"});
     }
 

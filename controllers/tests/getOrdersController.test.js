@@ -13,7 +13,7 @@ describe("Get Orders Controller Tests", () => {
 
         req = {
             user: {
-                _id: new ObjectId("67b18f9cbcd7fd83f1df3c20")
+                _id: "67b18f9cbcd7fd83f1df3c20"
             }
         };
         res = {
@@ -23,7 +23,7 @@ describe("Get Orders Controller Tests", () => {
         };
     }); 
 
-    // Case 1: Success case where the orders made by the user can be obtained
+    // Test 1: Success case where the orders made by the user can be obtained
     it('should allow the user to get the list of orders that they have made', async () => {
 
         const firstMockProduct = {
@@ -76,6 +76,10 @@ describe("Get Orders Controller Tests", () => {
 
         await getOrdersController(req, res);
 
+        // Check that the id of the buyer of the order and the id passed into req.user is the same
+        expect(res.json.mock.lastCall[0].buyer._id.toString()).toBe(req.user._id);
+
+        // Some checks to ensure that the order and products passed to res.json is correct
         expect(res.json.mock.lastCall[0]._id).toEqual(new ObjectId('67b1a6a6f9d490b2482c8eb2'));
         expect(res.json.mock.lastCall[0].products[0]._id).toEqual(new ObjectId('67af136e412da5fc3b82ecde'));
         expect(res.json.mock.lastCall[0].products[1]._id).toEqual(new ObjectId('67af1437412da5fc3b82ece7'));
@@ -83,10 +87,10 @@ describe("Get Orders Controller Tests", () => {
         expect(res.json.mock.lastCall[0].status).toBe('Delivered');
     });
 
-    // Case 2: Success case where user did not make any orders
+    // Test 2: Success case where user did not make any orders
     it('should return an empty array for the user who has made 0 orders', async () => {
        
-        // Chaining the populate calls here to eventually return mockOrder
+        // Chaining the populate calls here to eventually return empty array
         const mockPopulate = {
             populate: jest.fn().mockReturnValue({
                 populate: jest.fn().mockReturnValue([])
@@ -97,10 +101,11 @@ describe("Get Orders Controller Tests", () => {
 
         await getOrdersController(req, res);
 
+        // Check that an empty array is passed to res.json since there are no orders that can be found
         expect(res.json.mock.lastCall[0]).toEqual([]);
     });
 
-    // Case 3: Error when trying to get the orders
+    // Test 3: Error when trying to get the orders
     it('should throw an error when the user faces an error in getting the orders', async () => {
 
         orderModel.find = jest.fn().mockImplementation(() => {
@@ -108,7 +113,9 @@ describe("Get Orders Controller Tests", () => {
         });
 
         await getOrdersController(req, res);
+
         expect(res.status).toHaveBeenCalledWith(500);
+        // Check that the message shows that there is an error while getting orders
         expect(res.send.mock.lastCall[0].message).toBe("Error WHile Geting Orders");
     });
     
