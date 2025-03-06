@@ -26,7 +26,7 @@ describe("Login Controller Tests", () => {
         
     });
 
-    // Test 1: Success case where user is able to login successfully with non-empty valid email and non-empty valid password
+    // Test 1: Success case where user is able to login successfully with valid email and valid password
     it("should allow the user to login successfully when correct email and password is entered", async () => {
             // Specifying the user model's findOne mock functionality
             userModel.findOne = jest.fn().mockResolvedValue({
@@ -57,7 +57,7 @@ describe("Login Controller Tests", () => {
 
 
     // Email (Equivalence Partitioning) (There are 3 equivalence classes: Empty email, Non-empty invalid email, Valid email)
-    // Non-empty valid email is already covered in Test 1
+    // Valid email is already covered in Test 1
     // Test 2 (Empty email): Case where empty email is inputted
     it('should not allow user with an empty email to login', async () => {
         req.body.email = "";
@@ -86,7 +86,7 @@ describe("Login Controller Tests", () => {
 
 
     // Password (Equivalence Partitioning) (There are 3 equivalence classes: Empty password, Non-empty invalid password, Valid Password)
-    // Non-empty valid password is already covered in Test 1
+    // Valid password is already covered in Test 1
     // Test 4 (Empty Password): Case where empty password is inputted
     it('should not allow user with an empty password to login', async () => {
         req.body.password = "";

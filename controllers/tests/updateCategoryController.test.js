@@ -48,8 +48,8 @@ describe("Update Category Controller Tests", () => {
         expect(res.send.mock.lastCall[0].success).toEqual(true);
     });
 
-    // Name (Equivalence Partitioning) (There are 4 equivalence classes: Empty name, Non-empty invalid name, Non-empty but already used valid name, Non-empty and not used valid name)
-    // Non-empty and not used valid name is already covered in Test 1
+    // Name (Equivalence Partitioning) (There are 4 equivalence classes: Empty name, Non-empty invalid name, Already used valid name, Not used valid name)
+    // Not used valid name is already covered in Test 1
     // Test 2 (Empty name): Case where name is empty
     it('should not allow the user to update the category with empty name', async () => {
         req.body.name = "";
@@ -73,7 +73,7 @@ describe("Update Category Controller Tests", () => {
         expect(res.send.mock.lastCall[0].message).toBe("The name of the category can only be up to 100 characters long");
     });
 
-    // Test 4 (Non-empty but already used valid name): Case where name is already used
+    // Test 4 (Already used valid name): Case where name is already used
     it('should not allow the user to update the category if the name is already used', async () => {
         const category = {
             _id: new ObjectId("67bd7972f616a1f52783a628"),

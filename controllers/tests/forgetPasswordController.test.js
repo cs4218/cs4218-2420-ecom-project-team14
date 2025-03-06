@@ -38,9 +38,10 @@ describe("Forget Password Controller Tests", () => {
           userModel.findByIdAndUpdate = jest.fn().mockResolvedValue(null);
     });
 
-    // Test 1: Success case where user is able to reset their password with all valid non-empty fields
+    // Test 1: Success case where user is able to reset their password with all valid fields
     // This test also covers the case for the upper boundary for BVA for answer (100 characters)
     // This test also covers the case for the lower boundary for BVA for password (6 characters)
+    // This also covers Pairwise Testing Combination 1 (Valid email, Valid answer, Valid new password) 
     it('should allow the user to reset their password successfully with all valid fields', async () => {
         await forgotPasswordController(req, res);
 
@@ -50,7 +51,7 @@ describe("Forget Password Controller Tests", () => {
     });
 
     // Email (Equivalence Partitioning) (There are 3 equivalence classes: Empty email, Non-empty invalid email, Valid email)
-    // Non-empty valid email is already covered in Test 1
+    // Valid email is already covered in Test 1
     // Test 2 (Empty email): Case where email is empty
     it('should not allow the user to reset their password when their email is empty', async () => {
         req.body.email = "";
@@ -74,7 +75,7 @@ describe("Forget Password Controller Tests", () => {
     });
 
     // Answer (Equivalence Partitioning) (There are 3 equivalence classes: Empty answer, Non-empty invalid answer, Valid answer)
-    // Non-empty valid answer is already covered in Test 1
+    // Valid answer is already covered in Test 1
     // Test 4 (Empty answer): Case where answer is empty
     it('should not allow the user to reset their password when their answer is empty', async () => {
         req.body.answer = "";
@@ -99,7 +100,7 @@ describe("Forget Password Controller Tests", () => {
     });
     
     // Password (Equivalence Partitioning) (There are 3 equivalence classes: Empty password, Non-empty invalid password, Valid password)
-    // Non-empty valid password is already covered in Test 1
+    // Valid password is already covered in Test 1
     // Test 6 (Empty Password): Case where new password is empty
     it('should not allow the user to reset their password when their new password is empty', async () => {
         req.body.newPassword = "";
@@ -123,7 +124,7 @@ describe("Forget Password Controller Tests", () => {
         expect(res.send.mock.lastCall[0].message).toBe("The length of the new password should be at least 6 characters long");
     });
 
-    // Test 8: Case where non-empty valid email, non-empty valid password and non-empty valid answer is given but user does not exist
+    // Test 8: Case where valid email, valid password and valid answer is given but user does not exist
     it('should not allow the user to reset their password when the user does not exist', async () => {
         userModel.findOne = jest.fn().mockResolvedValue(null);
 
@@ -147,10 +148,12 @@ describe("Forget Password Controller Tests", () => {
         expect(res.send.mock.lastCall[0].message).toBe("Something went wrong");
     });
 
-    /* Pairwise Testing Combination 1 (Test 10)
+    // Some pairwise testing cases
+    // Pairwise Testing Combination 1 is already used in Test case 1
+    /* Pairwise Testing Combination 2 (Test 10)
     Email: Valid
     Answer: Non-empty invalid
-    New Password: Invalid
+    New Password: Non-empty invalid
     */
    it('should not allow the user to reset their password when valid email, non-empty invalid answer and non-empty invalid new password is passed as input', async () => {
     req.body.answer = "Basketball, Triple Jump, Cross country running, Half Marathon, Decathlon, Baseball, Volleyball, Rugby";
@@ -164,7 +167,7 @@ describe("Forget Password Controller Tests", () => {
    });
 
 
-   /* Pairwise Testing Combination 2 (Test 11)
+   /* Pairwise Testing Combination 3 (Test 11)
    Email: Valid
    Answer: Empty
    New Password: Empty
@@ -181,7 +184,7 @@ describe("Forget Password Controller Tests", () => {
   });
 
 
-  /* Pairwise Testing Combination 3 (Test 12)
+  /* Pairwise Testing Combination 4 (Test 12)
     Email: Non-empty invalid
     Answer: Non-empty invalid
     New Password: Empty
@@ -197,5 +200,38 @@ describe("Forget Password Controller Tests", () => {
     // Check that the message shows that new password is required
     expect(res.send.mock.lastCall[0].message).toBe("New Password is required");   
   });
+
+  /* Pairwise Testing Combination 5 (Test 13)
+    Email: Non-empty invalid
+    Answer: Empty
+    New Password: Valid
+  */
+ it('should not allow the user to reset their password when non-empty invalid email, empty answer and valid new password is passed as input', async () => {
+    req.body.email = "InvalidEmailShouldNotWork";
+    req.body.answer = "";
+
+    await forgotPasswordController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    // Check that the message shows that an answer is required
+    expect(res.send.mock.lastCall[0].message).toBe("An answer is required");
+ });
+
+
+  /* Pairwise Testing Combination 6 (Test 14)
+    Email: Non-empty invalid
+    Answer: Valid
+    New Password: Non-empty invalid
+  */
+ it('should not allow the user to reset their password when non-empty invalid email, valid answer and non-empty invalid new password is passed as input', async () => {
+    req.body.email = "InvalidEmailShouldNotWork";
+    req.body.newPassword = "5char";
+
+    await forgotPasswordController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    // Check that the message shows that the length of the new password should be at least 6 characters long
+    expect(res.send.mock.lastCall[0].message).toBe("The length of the new password should be at least 6 characters long");
+ });
 
 });

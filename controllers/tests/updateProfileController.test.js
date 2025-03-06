@@ -55,10 +55,11 @@ describe("Update Profile Controller Tests", () => {
           userModel.findById = jest.fn().mockResolvedValue(user);
     });
 
-    // Test 1 (Non-empty valid name, non-empty valid password, non-empty valid phone, non-empty valid address)
-    // Success case where the user is able to update the profile successfully with all valid, non-empty fields
+    // Test 1 (Non-empty valid name, Non-empty valid password, Non-empty valid phone, Non-empty valid address)
+    // Success case where the user is able to update the profile successfully with all non-empty, valid fields
     // This test also covers the case for lower boundary for the BVA for password (6 characters)
     // This test also covers the case for upper boundary for the BVA for address (150 characters)
+    // This also covers the pairwise testing combination 1 (Non-empty valid name, Non-empty valid password, Non-empty valid phone, Non-empty valid address)
     it("should allow the user to update the profile successfully", async () => {
       updateUser();
       userModel.findByIdAndUpdate = jest.fn().mockResolvedValue(updatedUser);
@@ -198,79 +199,103 @@ describe("Update Profile Controller Tests", () => {
     });
 
     // Some pairwise testing cases
-    /* Pairwise Combination 1 (Test 10)
-      Name: Valid
-      Pasword: Valid
-      Phone: Non-empty invalid
+    /* Pairwise Combination 2 (Test 10)
+      Name: Non-empty valid
+      Pasword: Empty
+      Phone: Empty
       Address: Empty
     */
-    it('should not allow the user to update their profile when valid name, valid password, non-empty invalid phone number and empty address is passed as input', async () => {
-      req.body.phone = "22345678";
+    it('should allow the user to update their profile when non-empty valid name, empty password, empty phone number and empty address is passed as input', async () => {
+      req.body.password = "";
+      req.body.phone = "";
       req.body.address = "";
 
+      updateUser();
+
+      userModel.findByIdAndUpdate = jest.fn().mockResolvedValue(updatedUser);
+
       await updateProfileController(req, res);
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send.mock.lastCall[0].message).toBe("The phone number must start with 6,8 or 9 and be 8 digits long");
+      
+      expect(res.status).toHaveBeenCalledWith(200);
+      // Check that the message shows that the profile is updated successfully
+      expect(res.send.mock.lastCall[0].message).toBe("Profile Updated Successfully");
+      // Check that the user's previous password is used
+      expect(res.send.mock.lastCall[0].updatedUser.password).toBe(user.password);
+      // Check that the user's previous phone is used
+      expect(res.send.mock.lastCall[0].updatedUser.phone).toBe(user.phone);
+      // Check that the user's previous address is used
+      expect(res.send.mock.lastCall[0].updatedUser.address).toBe(user.address);
     });
 
     /* Pairwise Combination 2 (Test 11)
-      Name: Valid
-      Password: Empty
-      Phone: Valid
+      Name: Non-empty valid
+      Password: Non-empty invalid
+      Phone: Non-empty invalid
       Address: Non-empty invalid
     */
-    it('should not allow the user to update their profile when valid name, empty password, valid phone number and non-empty invalid address is passed in as input', async () => {
-    req.body.password = "";
+    it('should not allow the user to update their profile when Non-empty Valid name, Non-empty Invalid password, Non-empty Invalid phone number and Non-empty Invalid address is passed in as input', async () => {
+    req.body.password = "5char";
+    req.body.phone = "12873822";
     req.body.address = "This is an extremely long long address with more than one hundred and fifty characters and this should not be allowed when trying to update the profile";
 
     await updateProfileController(req, res);
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.send.mock.lastCall[0].message).toBe("The address can only be up to 150 characters long");
+
+    // Check that the message shows that the password needs to be at least 6 characters long
+    expect(res.json.mock.lastCall[0].error).toBe("Passsword is required and 6 character long");
     });
 
    /* Pairwise Combination 3 (Test 12)
-    Name: Valid
-    Password: Non-empty Invalid
-    Phone: Empty
-    Address: Valid
+    Name: Empty
+    Password: Empty 
+    Phone: Non-empty invalid
+    Address: Non-empty valid
    */
-    it('should not allow the user to update their profile when valid name, non-empty invalid password, empty phone number and valid address is passed in as input', async () => {
-      req.body.password = "5char";
-      req.body.phone = "";
+    it('should not allow the user to update their profile when empty name, empty password,  Non-empty Invalid phone number and Non-empty Valid address is passed in as input', async () => {
+      req.body.name = "";
+      req.body.password = "";
+      req.body.phone = "12873822";
 
       await updateProfileController(req, res);
-      expect(res.json.mock.lastCall[0].error).toBe("Passsword is required and 6 character long");
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      // Check that the message shows that the phone number must start with 6,8 or 9 and be 8 digits long
+      expect(res.send.mock.lastCall[0].message).toBe("The phone number must start with 6,8 or 9 and be 8 digits long");
     });
 
     /* Pairwise Combination 4 (Test 13)
-      Name: Non-empty Invalid
-      Password: Empty
-      Phone: Non-empty Invalid
-      Address: Valid
+      Name: Empty
+      Password: Non-empty invalid
+      Phone: Non-empty valid
+      Address: Empty
     */
-    it('should not allow the user to update their profile when non-empty invalid name, empty password, non-empty invalid phone number and valid address is passed as input', async () => {
-      req.body.name = "John William Samuel Douglas Russell Wallace Brandon Blaine James Joseph Johnson Monrole Jefferson Theodore Timothy Reece Franklin Charles Watson Holmes";
-      req.body.password = "";
-      req.body.phone = "17293922";
+    it('should not allow the user to update their profile when empty name, Non-empty Invalid password, Non-empty Valid phone number and empty address is passed as input', async () => {
+      req.body.name = "";
+      req.body.password = "5char";
+      req.body.address = "";
 
       await updateProfileController(req, res);
-      expect(res.send.mock.lastCall[0].message).toBe("The name can only be up to 150 characters long");
+      
+      // Check that the message shows that the password needs to be at least 6 characters long
+      expect(res.json.mock.lastCall[0].error).toBe("Passsword is required and 6 character long");
     });
 
     /* Pairwise Combination 5 (Test 14)
-      Name: Non-empty Invalid
-      Password: Valid
+      Name: Empty
+      Password: Non-empty Valid
       Phone: Empty
       Address: Non-empty Invalid
     */
-    it('should not allow the user to update their profile when non-empty invalid name, valid password, empty phone and non-empty invalid address is passed as input', async () => {
-      req.body.name = "John William Samuel Douglas Russell Wallace Brandon Blaine James Joseph Johnson Monrole Jefferson Theodore Timothy Reece Franklin Charles Watson Holmes";
+    it('should not allow the user to update their profile when Non-empty Invalid name, Non-empty Valid password, empty phone and Non-empty Invalid address is passed as input', async () => {
+      req.body.name = "";
       req.body.phone = "";
       req.body.address = "This is an extremely long long address with more than one hundred and fifty characters and this should not be allowed when trying to update the profile";
 
 
       await updateProfileController(req, res);
-      expect(res.send.mock.lastCall[0].message).toBe("The name can only be up to 150 characters long");
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      // Check that message shows that address can only be up to 150 characters long
+      expect(res.send.mock.lastCall[0].message).toBe("The address can only be up to 150 characters long");
     });
 
 });

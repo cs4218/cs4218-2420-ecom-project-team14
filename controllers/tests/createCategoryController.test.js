@@ -26,7 +26,7 @@ describe("Create Category Controller Tests", () => {
         }
     });
 
-    // Test 1: Success case where user can create category successfully with non-empty and not used valid name
+    // Test 1: Success case where user can create category successfully with not used valid name
     // This test also covers the case for the upper boundary for BVA for category name (100 characters)
     it('should allow the user to create category with non-empty and not used valid name', async () => {
         await createCategoryController(req, res);
@@ -37,8 +37,8 @@ describe("Create Category Controller Tests", () => {
         expect(res.send.mock.lastCall[0].success).toEqual(true);
     });
 
-    // Name (Equivalence Partitioning) (There are 4 equivalence classes: Empty name, Non-empty invalid name, Non-empty but already used valid name, Non-empty and not used valid name)
-    // Non-empty and not used valid name is already covered in Test 1
+    // Name (Equivalence Partitioning) (There are 4 equivalence classes: Empty name, Non-empty invalid name, Already used valid name, Not used valid name)
+    // Not used valid name is already covered in Test 1
     // Test 2 (Empty name): Case where name of category is empty
     it('should not allow the user to create category with empty name', async () => {
         req.body.name = "";
@@ -62,7 +62,7 @@ describe("Create Category Controller Tests", () => {
         expect(res.send.mock.lastCall[0].message).toBe("Name of category can only be up to 100 characters long");
     });
 
-    // Test 4 (Non-empty but already used valid name): Case where non-empty valid name already exists in database
+    // Test 4 (Already used valid name): Case where non-empty valid name already exists in database
     it('should not allow the user to create category with name that is already used', async () => {
         const category = {
             _id: new ObjectId("67bd7972f616a1f52783a628"),
