@@ -1,22 +1,67 @@
-import React, { useState } from "react";
-import Layout from "./../../components/Layout";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import "../../styles/AuthStyles.css";
+import Layout from "./../../components/Layout";
+
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [DOB, setDOB] = useState("");
   const [answer, setAnswer] = useState("");
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  const validateFormData = () => {
+    let errors = {};
+
+    // Add validation for name (Maximum 150 characters long)
+    if (name.length > 150) {
+      errors.name = true;
+    }
+
+    // Add validation for password length (Need to be minimum of length 6)
+    if (password.length < 6) {
+      errors.password = true;
+    }
+
+    const emailRegex =
+      /^(?!^\.)(?!.*\.@)(?!.*\.{2})[a-zA-Z0-9.]{1,64}@(?!@\.)(?!.*\.$)(?!.*\.{2})[a-zA-Z0-9.]{1,64}$/;
+    if (!email.match(emailRegex)) {
+      errors.email = true;
+    }
+
+    // Add validation for phone number
+    const phoneRegex = /^[689]\d{7}$/;
+    if (!phone.match(phoneRegex)) {
+      errors.phone = true;
+    }
+
+    // Add validation for address
+    if (address.length > 150) {
+      errors.address = true;
+    }
+
+    // Add validation for answer
+    if (answer.length > 100) {
+      errors.answer = true;
+    }
+    return errors;
+  };
 
   // form function
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errors = validateFormData();
+    if (errors.keys().length > 0) {
+      setErrors(errors);
+      return;
+    }
+
     try {
       const res = await axios.post("/api/v1/auth/register", {
         name,
@@ -24,7 +69,6 @@ const Register = () => {
         password,
         phone,
         address,
-        DOB,
         answer,
       });
       if (res && res.data.success) {
@@ -38,6 +82,8 @@ const Register = () => {
       toast.error("Something went wrong");
     }
   };
+
+  useEffect(() => {}, []);
 
   return (
     <Layout title="Register - Ecommerce App">
@@ -55,6 +101,11 @@ const Register = () => {
               required
               autoFocus
             />
+            {errors.name && (
+              <p style={{ color: "red" }}>
+                The name can only be up to 150 characters long
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <input
@@ -66,6 +117,9 @@ const Register = () => {
               placeholder="Enter Your Email "
               required
             />
+            {errors.email && (
+              <p style={{ color: "red" }}>The email is not valid</p>
+            )}
           </div>
           <div className="mb-3">
             <input
@@ -77,6 +131,11 @@ const Register = () => {
               placeholder="Enter Your Password"
               required
             />
+            {errors.name && (
+              <p style={{ color: "red" }}>
+                The password must be more than 6 characters long
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <input
@@ -88,6 +147,12 @@ const Register = () => {
               placeholder="Enter Your Phone"
               required
             />
+            {errors.name && (
+              <p style={{ color: "red" }}>
+                The phone number is not valid. The phone number must start with
+                6,8 or 9 and be 8 digits long
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <input
@@ -99,17 +164,11 @@ const Register = () => {
               placeholder="Enter Your Address"
               required
             />
-          </div>
-          <div className="mb-3">
-            <input
-              type="Date"
-              value={DOB}
-              onChange={(e) => setDOB(e.target.value)}
-              className="form-control"
-              id="exampleInputDOB1"
-              placeholder="Enter Your DOB"
-              required
-            />
+            {errors.name && (
+              <p style={{ color: "red" }}>
+                The address can only be up to 150 characters long
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <input
@@ -121,6 +180,11 @@ const Register = () => {
               placeholder="What is Your Favorite sports"
               required
             />
+            {errors.name && (
+              <p style={{ color: "red" }}>
+                The answer can only be up to 100 characters long
+              </p>
+            )}
           </div>
           <button type="submit" className="btn btn-primary">
             REGISTER
