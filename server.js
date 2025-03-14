@@ -37,10 +37,13 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 6060;
 
-app.listen(PORT, () => {
-  console.log(
-    `Server running on ${process.env.DEV_MODE} mode on ${PORT}`.bgCyan.white
-  );
-});
+if (process.env.NODE_ENV !== "test") {
+  // There is conflict of port during the integration testing so this line is only used for dev
+  app.listen(PORT, () => {
+    console.log(
+      `Server running on ${process.env.DEV_MODE} mode on ${PORT}`.bgCyan.white
+    );
+  });
+}
 
 export default app;
