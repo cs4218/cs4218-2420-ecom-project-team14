@@ -342,6 +342,12 @@ export const orderStatusController = async (req, res) => {
       { status },
       { new: true }
     );
+
+    if (!orders) {
+      return res.status(400).send({
+        message: "Invalid order id was provided and order cannot be found"
+      })
+    }
     res.json(orders);
   } catch (error) {
     console.log(error);

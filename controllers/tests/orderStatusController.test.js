@@ -90,13 +90,14 @@ describe("Order Status Controller Tests", () => {
     // Order ID (Equivalence Partitioning) (There are 2 equivalence classes: Valid Order ID and Invalid Order ID)
     // Valid Order ID is already covered
     // Test 3 (Invalid OrderId): Case where user provides invalid order id when updating the order status
-    it('should return null since there is no order that can be found to update', async () => {
+    it('should send an error message that there is no order that can be found to update', async () => {
         req.params.orderId = "67b1f4870377ccbad412899e";
         
         await orderStatusController(req, res);
 
-        // Check that null is passed in as argument to res.json since no order can be found
-        expect(res.json.mock.lastCall[0]).toEqual(null);
+        expect(res.status).toHaveBeenCalledWith(400)
+        // Check that there is a message which shows that no order can be found
+        expect(res.send.mock.lastCall[0].message).toBe("Invalid order id was provided and order cannot be found");
 
     });
 
