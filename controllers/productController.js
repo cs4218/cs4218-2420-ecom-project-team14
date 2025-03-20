@@ -670,6 +670,8 @@ export const brainTreePaymentController = async (req, res) => {
     cart.map((i) => {
       total += i.price;
     });
+    // Truncate price to 2dp
+    total = total.toFixed(2);
     let newTransaction = gateway.transaction.sale(
       {
         amount: total,
@@ -680,11 +682,38 @@ export const brainTreePaymentController = async (req, res) => {
       },
       function (error, result) {
         if (result) {
-          const order = new orderModel({
-            products: cart,
-            payment: result,
-            buyer: req.user._id,
-          }).save();
+          if (result.success) {
+            // Create order with processing order status
+            const order = new orderModel({
+              products: cart,
+              payment: result,
+              buyer: req.user._id,
+              status: "Processing"
+            }).save();
+
+            const productCount = new Map();
+            // Getting the quantity of each product in the order (To avoid making too many API calls)
+            cart.forEach((product) => {
+              if (productCount.get(product._id)) {
+                productCount.set(product._id, productCount.get(product._id) + 1);
+              } else {
+                productCount.set(product._id, 1);
+              }
+            });
+            
+            // Decrementing product count for each product
+            productCount.forEach((value, key) => {
+              productModel.findByIdAndUpdate(key, 
+                {$inc: {quantity: -value}}
+              ).exec();
+            });
+          } else {
+            const order = new orderModel({
+              products: cart,
+              payment: result,
+              buyer: req.user._id
+            }).save();
+          }
           res.json({ ok: true });
         } else {
           res.status(500).send(error);
