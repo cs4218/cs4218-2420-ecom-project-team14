@@ -161,6 +161,7 @@ describe("HomePage component", () => {
         { _id: "1", name: "Test Category 1", slug: "category-1" },
         { _id: "2", name: "Test Category 2", slug: "category-2" },
       ];
+
       axios.get.mockImplementation((url) => {
         if (url === "/api/v1/category/get-category") {
           return Promise.resolve({
@@ -175,16 +176,21 @@ describe("HomePage component", () => {
         }
         return Promise.reject(new Error(`Not found: ${url}`));
       });
+
       axios.post.mockResolvedValueOnce({ data: { products: [] } });
+
       render(<HomePage />);
+
       await waitFor(() => {
         expect(screen.getByText("Test Category 1")).toBeInTheDocument();
       });
       await waitFor(() => {
         expect(screen.getByText("Test Category 2")).toBeInTheDocument();
       });
+
       const checkbox = screen.getByRole("checkbox", { name: /Category 1/i });
       fireEvent.click(checkbox);
+
       await waitFor(() => {
         expect(axios.post).toHaveBeenCalledWith(
           "/api/v1/product/product-filters",
@@ -194,6 +200,7 @@ describe("HomePage component", () => {
           }
         );
       });
+
       // Categories should still be visible after
       await waitFor(() => {
         expect(screen.getByText("Test Category 1")).toBeInTheDocument();
@@ -394,11 +401,11 @@ describe("HomePage component", () => {
         if (url === "/api/v1/product/product-list/1") {
           return Promise.resolve({ data: { products: initialProducts } });
         }
-        if (url === "/api/v1/product/product-count") {
-          return Promise.resolve({ data: { total: 8 } });
-        }
         if (url === "/api/v1/product/product-list/2") {
           return Promise.resolve({ data: { products: moreProducts } });
+        }
+        if (url === "/api/v1/product/product-count") {
+          return Promise.resolve({ data: { total: 8 } });
         }
         // Fallback
         return Promise.resolve({ data: {} });
@@ -462,9 +469,11 @@ describe("HomePage component", () => {
       axios.get.mockImplementation((url) => {
         if (url.includes("/api/v1/category/get-category")) {
           return Promise.resolve({ data: { success: true, category: [] } });
-        } else if (url.includes("/api/v1/product/product-count")) {
+        }
+        if (url.includes("/api/v1/product/product-count")) {
           return Promise.resolve({ data: { total: 1 } });
-        } else if (url.includes("/api/v1/product/product-list/1")) {
+        }
+        if (url.includes("/api/v1/product/product-list/1")) {
           return Promise.resolve({ data: { products: singleProduct } });
         }
         return Promise.reject(new Error(`Not found: ${url}`));
@@ -479,9 +488,15 @@ describe("HomePage component", () => {
     it("should hide load more button when products.length === total (boundary)", async () => {
       const products = [{ _id: 1, name: "Product 1" }];
 
-      axios.get
-        .mockResolvedValueOnce({ data: { products } })
-        .mockResolvedValueOnce({ data: { total: 1 } });
+      axios.get.mockImplementation((url) => {
+        if (url.includes("/api/v1/product/product-count")) {
+          return Promise.resolve({ data: { total: 1 } });
+        }
+        if (url.includes("/api/v1/product/product-list/1")) {
+          return Promise.resolve({ data: { products } });
+        }
+        return Promise.reject(new Error(`Not found: ${url}`));
+      });
 
       render(<HomePage />);
 

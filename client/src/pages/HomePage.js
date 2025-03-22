@@ -3,14 +3,13 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiOutlineReload } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Prices } from "../components/Prices";
 import { useCart } from "../context/cart";
 import "../styles/Homepages.css";
 import Layout from "./../components/Layout";
 
 const HomePage = () => {
-  const navigate = useNavigate();
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -47,6 +46,7 @@ const HomePage = () => {
       setLoading(true);
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
       setLoading(false);
+      console.log(data)
       setProducts(data.products);
     } catch (error) {
       setLoading(false);
@@ -193,7 +193,11 @@ const HomePage = () => {
           <h1 className="text-center">All Products</h1>
           <div className="d-flex flex-wrap">
             {products?.map((p) => (
-              <div className="card m-2" key={p._id}>
+              <div
+                className="card m-2"
+                key={p._id}
+                id={`product-card-${p.slug}`}
+              >
                 <img
                   src={`/api/v1/product/product-photo/${p._id}`}
                   className="card-img-top"
@@ -219,12 +223,12 @@ const HomePage = () => {
                       : ""}
                   </p>
                   <div className="card-name-price">
-                    <button
+                    <Link
                       className="btn btn-info ms-1"
-                      onClick={() => navigate(`/product/${p.slug}`)}
+                      to={`/product/${p.slug}`}
                     >
                       More Details
-                    </button>
+                    </Link>
                     <button
                       className="btn btn-dark ms-1"
                       onClick={() => addToCart(p.slug)}

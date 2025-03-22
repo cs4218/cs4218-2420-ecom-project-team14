@@ -1,20 +1,17 @@
-import React, { useState } from "react";
-import Layout from "./../../components/Layout";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
-import "../../styles/AuthStyles.css";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth";
+import "../../styles/AuthStyles.css";
+import Layout from "./../../components/Layout";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [auth, setAuth] = useAuth();
-  
 
   const navigate = useNavigate();
-  const location = useLocation();
-  
 
   // form function
   const handleSubmit = async (e) => {
@@ -28,29 +25,31 @@ const Login = () => {
       });
       if (res && res.data.success) {
         toast.success(res.data && res.data.message, {
-            duration: 5000,
-            icon: "🙏",
-            style: {
-              background: "green",
-              color: "white",
-            },
-          });
+          duration: 5000,
+          icon: "🙏",
+          style: {
+            background: "green",
+            color: "white",
+          },
+        });
         setAuth({
-            ...auth,
-            user: res.data.user,
-            token: res.data.token,
+          ...auth,
+          user: res.data.user,
+          token: res.data.token,
         });
         localStorage.setItem("auth", JSON.stringify(res.data));
-        navigate(location.state || "/");
+        navigate("/");
       } else {
         toast.error(res.data.message);
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        toast.error(error.response.data?.message ?? "Error encountered when logging in");
+        toast.error(
+          error.response.data?.message ?? "Error encountered when logging in"
+        );
       } else {
-      console.log(error);
-      toast.error("Something went wrong");
+        console.log(error);
+        toast.error("Something went wrong");
       }
     }
   };

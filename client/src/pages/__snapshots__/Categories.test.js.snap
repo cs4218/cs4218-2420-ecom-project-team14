@@ -14,6 +14,7 @@ exports[`Categories Component matches snapshot 1`] = `
       >
         <div
           class="col-md-6 mt-5 mb-3 gx-3 gy-3"
+          id="category-card-electronics"
         >
           <a
             class="btn btn-primary"
@@ -24,6 +25,7 @@ exports[`Categories Component matches snapshot 1`] = `
         </div>
         <div
           class="col-md-6 mt-5 mb-3 gx-3 gy-3"
+          id="category-card-clothing"
         >
           <a
             class="btn btn-primary"
@@ -34,6 +36,7 @@ exports[`Categories Component matches snapshot 1`] = `
         </div>
         <div
           class="col-md-6 mt-5 mb-3 gx-3 gy-3"
+          id="category-card-books"
         >
           <a
             class="btn btn-primary"

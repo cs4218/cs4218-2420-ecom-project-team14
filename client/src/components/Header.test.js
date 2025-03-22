@@ -65,8 +65,8 @@ describe("Header Component", () => {
       "/"
     );
 
-    expect(getByRole("link", { name: "Categories" })).toBeInTheDocument();
-    expect(getByRole("link", { name: "Categories" })).toHaveAttribute(
+    expect(getByRole("link", { name: "All Categories" })).toBeInTheDocument();
+    expect(getByRole("link", { name: "All Categories" })).toHaveAttribute(
       "href",
       "/categories"
     );
@@ -76,28 +76,6 @@ describe("Header Component", () => {
       "href",
       "/cart"
     );
-  });
-
-  it("renders category links correctly", () => {
-    useAuth.mockReturnValue([null, mockSetAuth]);
-    useCategory.mockReturnValue(mockCategories);
-
-    const { getByRole } = render(
-      <MemoryRouter>
-        <Header />
-      </MemoryRouter>
-    );
-
-    for (let idx = 0; idx < mockCategories.length; idx++) {
-      const currCategory = mockCategories[idx];
-      expect(
-        getByRole("link", { name: currCategory.name })
-      ).toBeInTheDocument();
-      expect(getByRole("link", { name: currCategory.name })).toHaveAttribute(
-        "href",
-        `/category/${currCategory.slug}`
-      );
-    }
   });
 
   describe("when user is logged in", () => {
@@ -148,11 +126,7 @@ describe("Header Component", () => {
       );
 
       expect(getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
-      expect(getByRole("link", { name: "Logout" })).toBeInTheDocument();
-      expect(getByRole("link", { name: "Logout" })).toHaveAttribute(
-        "href",
-        "/"
-      );
+      expect(getByRole("button", { name: "Logout" })).toBeInTheDocument();
     });
 
     it("should not render register and login links", () => {
@@ -179,7 +153,7 @@ describe("Header Component", () => {
         </MemoryRouter>
       );
 
-      fireEvent.click(getByRole("link", { name: "Logout" }));
+      fireEvent.click(getByRole("button", { name: "Logout" }));
 
       await waitFor(() => {
         expect(mockSetAuth).toHaveBeenCalledTimes(1);
